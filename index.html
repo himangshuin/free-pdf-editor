@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PDF Editor Pro – Assamese (অসমীয়া) support</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;700&family=Noto+Serif+Bengali:wght@400;700&family=Hind+Siliguri:wght@400;600&family=Anek+Bangla:wght@400;700&family=Roboto:wght@400;700&display=swap">
+<style>
+:root{--bg:#f4f5f7;--panel:#fff;--text:#1d2330;--muted:#667085;--line:#d9dde5;--accent:#2f6fed;--accent-t:#fff;--stage:#e4e7ec;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181e;--panel:#1f242d;--text:#e8ebf0;--muted:#98a2b3;--line:#343b47;--accent:#6b9bff;--accent-t:#0d1220;--stage:#101318}}
+:root[data-theme="dark"]{--bg:#15181e;--panel:#1f242d;--text:#e8ebf0;--muted:#98a2b3;--line:#343b47;--accent:#6b9bff;--accent-t:#0d1220;--stage:#101318}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 "Noto Sans Bengali",Roboto,system-ui,sans-serif}
+h1{font-size:17px;margin:0;padding:10px 14px 0}
+.bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:8px 12px;padding:6px 8px}
+.grp{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.sep{width:1px;align-self:stretch;background:var(--line);margin:0 2px}
+button,select,input[type=number],input[type=search]{font:inherit;font-size:13px;color:var(--text);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 9px}
+button{cursor:pointer}
+button.on{background:var(--accent);color:var(--accent-t);border-color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-t);border-color:var(--accent);font-weight:600}
+button:disabled{opacity:.45;cursor:default}
+input[type=color]{width:28px;height:28px;padding:0;border:1px solid var(--line);border-radius:6px;background:none}
+input[type=number]{width:60px}input[type=search]{width:120px}
+label{font-size:11px;color:var(--muted)}
+.app{display:flex;gap:10px;margin:0 12px 16px}
+#side{width:132px;flex:none;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px;overflow-y:auto;max-height:78vh}
+.th{border:2px solid var(--line);border-radius:8px;padding:4px;margin-bottom:8px;text-align:center;cursor:pointer}
+.th.cur{border-color:var(--accent)}
+.th canvas{width:100%;display:block;background:#fff}
+.th small{color:var(--muted);display:flex;justify-content:space-between;align-items:center;margin-top:3px}
+.th button{padding:0 6px;font-size:12px}
+#stage{flex:1;min-width:0;background:var(--stage);border-radius:12px;padding:14px;overflow:auto;min-height:60vh;max-height:78vh;text-align:center}
+#wrap{position:relative;display:inline-block;box-shadow:0 2px 14px rgba(0,0,0,.25);background:#fff;text-align:left}
+canvas{display:block}
+#ed{position:absolute;border:2px solid var(--accent);background:rgba(255,255,255,.95);color:#000;padding:0 2px;outline:none;line-height:1.3;border-radius:2px}
+#empty{padding:60px 16px;color:var(--muted);text-align:center}
+.hint{font-size:12px;color:var(--muted);padding:0 14px 8px}
+@media (max-width:700px){.app{flex-direction:column}#side{width:auto;display:flex;gap:8px;overflow-x:auto;max-height:none}.th{min-width:96px;margin:0}}
+</style>
+</head>
+<body>
+<h1>📝 PDF Editor Pro <span style="font-weight:400">· অসমীয়া সমৰ্থন</span></h1>
+<div class="bar">
+  <div class="grp"><button class="primary" id="open">Open</button><button id="merge" disabled>+ Add PDF</button>
+    <input type="file" id="file" accept="application/pdf" hidden><input type="file" id="file2" accept="application/pdf" hidden><input type="file" id="imgf" accept="image/*" hidden></div>
+  <div class="sep"></div>
+  <div class="grp" id="tools">
+    <button data-mode="select" class="on" title="Move / delete objects. Double-click text to edit">Select</button>
+    <button data-mode="edit" title="Click existing PDF text to replace it">Edit text</button>
+    <button data-mode="add" title="Click to add text">Add text</button>
+    <button data-mode="erase" title="Drag to remove content">Erase</button>
+    <button data-mode="hl" title="Click a line of text or drag to highlight">Highlight</button>
+    <button data-mode="ul" title="Click text to underline">Underline</button>
+    <button data-mode="st" title="Click text to strike through">Strike</button>
+    <button data-mode="pen">Pen</button>
+    <button data-mode="rect">Box</button>
+    <button data-mode="ell">Oval</button>
+    <button data-mode="line">Line</button>
+    <button id="img">Image / Sign</button>
+  </div>
+</div>
+<div class="bar">
+  <div class="grp"><label>Font</label>
+    <select id="font"><option>Noto Sans Bengali</option><option>Noto Serif Bengali</option><option>Hind Siliguri</option><option>Anek Bangla</option><option>Roboto</option></select>
+    <label>Size</label><input type="number" id="size" placeholder="auto" min="6" max="120">
+    <label>Line</label><input type="number" id="lw" value="2" min="1" max="20" style="width:50px"></div>
+  <div class="sep"></div>
+  <div class="grp"><label>Text/stroke</label><input type="color" id="tcolor" value="#000000"><label>Erase</label><input type="color" id="ecolor" value="#ffffff"><label>Mark</label><input type="color" id="hcolor" value="#ffe600"></div>
+  <div class="sep"></div>
+  <div class="grp"><input type="search" id="q" placeholder="Search text…"><button id="undo" disabled>Undo</button><button id="del" disabled>Delete</button></div>
+  <div class="sep"></div>
+  <div class="grp"><button id="prev" disabled>‹</button><span id="pg">–</span><button id="next" disabled>›</button><label>Zoom</label><input type="range" id="zoom" min="40" max="150" value="70">
+    <button class="primary" id="save" disabled>Download PDF</button></div>
+</div>
+<p class="hint">Click a thumbnail to jump to a page; use ↑ ↓ ✕ to reorder or delete pages. Ctrl+Z undoes, Delete removes the selected object. Saved pages are flattened images so Assamese conjuncts render perfectly (text isn’t selectable afterwards).</p>
+<div class="app"><div id="side" hidden></div>
+<div id="stage"><div id="empty">No PDF open yet. Click “Open” to begin.</div>
+  <div id="wrap" hidden><canvas id="cv"></canvas><input id="ed" hidden></div></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const S=2,$=id=>document.getElementById(id),cv=$("cv"),ctx=cv.getContext("2d"),ed=$("ed"),wrap=$("wrap");
+pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+let pages=[],cur=0,mode="select",undoS=[],drag=null,sel=null,mv=null,pending=null,term="",fname="edited.pdf";
+
+const snap=()=>{undoS.push(pages.map(p=>({p,ops:p.ops.slice()})));if(undoS.length>60)undoS.shift();$("undo").disabled=false};
+function undo(){const s=undoS.pop();if(!s)return;pages=s.map(x=>(x.p.ops=x.ops,x.p));cur=Math.min(cur,pages.length-1);sel=null;show();$("undo").disabled=!undoS.length}
+async function loadPdf(buf){
+  const doc=await pdfjsLib.getDocument({data:buf}).promise,out=[];
+  for(let i=1;i<=doc.numPages;i++){
+    const p=await doc.getPage(i),vp=p.getViewport({scale:S}),c=document.createElement("canvas");c.width=vp.width;c.height=vp.height;
+    await p.render({canvasContext:c.getContext("2d"),viewport:vp}).promise;
+    const tc=await p.getTextContent(),boxes=[];
+    for(const it of tc.items){if(!it.str||!it.str.trim())continue;const t=pdfjsLib.Util.transform(vp.transform,it.transform);
+      boxes.push({x:t[4],y:t[5],w:it.width*S,fs:Math.hypot(t[2],t[3]),str:it.str})}
+    out.push({base:c,boxes,ops:[]});
+  }return out;
+}
+$("open").onclick=()=>$("file").click();$("merge").onclick=()=>$("file2").click();
+$("file").onchange=async e=>{const f=e.target.files[0];if(!f)return;fname=f.name.replace(/\.pdf$/i,"")+"-edited.pdf";
+  $("empty").textContent="Loading…";
+  try{pages=await loadPdf(await f.arrayBuffer());undoS=[];cur=0;sel=null;$("empty").hidden=true;wrap.hidden=false;$("side").hidden=false;
+    ["save","prev","next","merge"].forEach(i=>$(i).disabled=false);show()}
+  catch(err){$("empty").hidden=false;$("empty").textContent="Could not open this PDF: "+err.message}};
+$("file2").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const n=await loadPdf(await f.arrayBuffer());snap();pages.push(...n);show()}catch(err){alert("Could not add PDF: "+err.message)}e.target.value=""};
+
+function show(){const p=pages[cur];cv.width=p.base.width;cv.height=p.base.height;zoom();draw();thumbs();$("pg").textContent=(cur+1)+" / "+pages.length}
+function zoom(){cv.style.width=(cv.width/S*$("zoom").value/100*1.4)+"px"}
+function drawOp(c,o){
+  c.save();c.fillStyle=c.strokeStyle=o.color;c.lineWidth=o.lw||2;c.lineCap="round";c.lineJoin="round";
+  if(o.t==="r")c.fillRect(o.x,o.y,o.w,o.h);
+  else if(o.t==="h"){c.globalCompositeOperation="multiply";c.fillRect(o.x,o.y,o.w,o.h)}
+  else if(o.t==="t"){c.font=o.size+'px "'+o.font+'"';c.textBaseline="alphabetic";c.fillText(o.text,o.x,o.y)}
+  else if(o.t==="s"){if(o.k==="e"){c.beginPath();c.ellipse(o.x+o.w/2,o.y+o.h/2,Math.abs(o.w/2),Math.abs(o.h/2),0,0,7);c.stroke()}else c.strokeRect(o.x,o.y,o.w,o.h)}
+  else if(o.t==="l"){c.beginPath();c.moveTo(o.x,o.y);c.lineTo(o.x2,o.y2);c.stroke()}
+  else if(o.t==="p"){c.beginPath();o.pts.forEach((q,i)=>i?c.lineTo(q[0],q[1]):c.moveTo(q[0],q[1]));c.stroke()}
+  else if(o.t==="i")c.drawImage(o.img,o.x,o.y,o.w,o.h);
+  c.restore();
+}
+const paint=(c,p)=>{c.drawImage(p.base,0,0);p.ops.forEach(o=>drawOp(c,o))};
+function bb(o){
+  if(o.t==="t"){ctx.font=o.size+'px "'+o.font+'"';return{x:o.x,y:o.y-o.size,w:ctx.measureText(o.text).width,h:o.size*1.3}}
+  if(o.t==="p"){const xs=o.pts.map(q=>q[0]),ys=o.pts.map(q=>q[1]),x=Math.min(...xs),y=Math.min(...ys);return{x,y,w:Math.max(...xs)-x,h:Math.max(...ys)-y}}
+  if(o.t==="l")return{x:Math.min(o.x,o.x2),y:Math.min(o.y,o.y2)-8,w:Math.abs(o.x2-o.x)||2,h:Math.abs(o.y2-o.y)+16};
+  const x=Math.min(o.x,o.x+o.w),y=Math.min(o.y,o.y+o.h);return{x,y,w:Math.abs(o.w),h:Math.abs(o.h)};
+}
+function moved(o,dx,dy){const n={...o};
+  if(o.t==="p")n.pts=o.pts.map(q=>[q[0]+dx,q[1]+dy]);else{n.x+=dx;n.y+=dy;if(o.t==="l"){n.x2+=dx;n.y2+=dy}}return n}
+function draw(){
+  const p=pages[cur];paint(ctx,p);
+  if(term)for(const b of p.boxes)if(b.str.toLowerCase().includes(term)){ctx.strokeStyle="#ff7a00";ctx.lineWidth=3;ctx.strokeRect(b.x-2,b.y-b.fs,b.w+4,b.fs*1.3)}
+  if(drag){if(drag.t==="r"||drag.t==="h"){ctx.save();ctx.strokeStyle="#2f6fed";ctx.setLineDash([8,6]);ctx.lineWidth=2;ctx.strokeRect(drag.x,drag.y,drag.w,drag.h);ctx.restore()}else drawOp(ctx,drag)}
+  if(sel&&p.ops.includes(sel)){const b=bb(sel);ctx.save();ctx.strokeStyle="#2f6fed";ctx.lineWidth=2;ctx.setLineDash([6,4]);ctx.strokeRect(b.x-4,b.y-4,b.w+8,b.h+8);ctx.restore()}
+  $("del").disabled=!(sel&&p.ops.includes(sel));
+}
+function thumbs(){
+  const side=$("side");side.innerHTML="";
+  pages.forEach((p,i)=>{const d=document.createElement("div");d.className="th"+(i===cur?" cur":"");
+    const c=document.createElement("canvas"),k=110/p.base.width;c.width=110;c.height=Math.round(p.base.height*k);
+    const x=c.getContext("2d");x.scale(k,k);paint(x,p);d.appendChild(c);
+    const s=document.createElement("small");s.innerHTML=`<span>${i+1}</span><span><button data-a="up" data-i="${i}">↑</button> <button data-a="dn" data-i="${i}">↓</button> <button data-a="rm" data-i="${i}">✕</button></span>`;
+    d.appendChild(s);d.onclick=e=>{const a=e.target.dataset.a;if(!a){commit();cur=i;show();return}
+      const j=+e.target.dataset.i;
+      if(a==="rm"&&pages.length>1){snap();pages.splice(j,1);cur=Math.min(cur,pages.length-1)}
+      else if(a==="up"&&j>0){snap();[pages[j-1],pages[j]]=[pages[j],pages[j-1]];cur=j-1}
+      else if(a==="dn"&&j<pages.length-1){snap();[pages[j+1],pages[j]]=[pages[j],pages[j+1]];cur=j+1}
+      show()};
+    side.appendChild(d)});
+}
+const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}};
+const loadFont=async(f,t)=>{try{await document.fonts.load('16px "'+f+'"',t||"অআকখ")}catch(e){}};
+const hitBox=m=>pages[cur].boxes.find(b=>m.x>=b.x-2&&m.x<=b.x+b.w+2&&m.y>=b.y-b.fs&&m.y<=b.y+b.fs*.35);
+const push=(...ops)=>{snap();pages[cur].ops.push(...ops);sel=ops[ops.length-1];draw();thumbs()};
+
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;
+  document.querySelectorAll("[data-mode]").forEach(x=>x.classList.toggle("on",x===b));commit();
+  cv.style.cursor=mode==="select"?"default":["add"].includes(mode)?"text":["edit","ul","st"].includes(mode)?"pointer":"crosshair"});
+
+function openEditor(x,y,size,text,eraseRect,replace){
+  commit();const k=cv.getBoundingClientRect().width/cv.width;pending={x,y,size,eraseRect,replace};
+  ed.hidden=false;ed.value=text;ed.style.left=(x*k-2)+"px";ed.style.top=((y-size)*k)+"px";ed.style.fontSize=(size*k)+"px";
+  ed.style.fontFamily='"'+$("font").value+'",sans-serif';ed.style.height=(size*1.3*k)+"px";ed.style.width=Math.max(140,text.length*size*.6+40)*k+"px";
+  loadFont($("font").value,text);ed.focus();ed.select();
+}
+async function commit(){
+  if(!pending){ed.hidden=true;return}
+  const p=pending,text=ed.value;pending=null;ed.hidden=true;
+  const g=[];if(p.eraseRect)g.push(p.eraseRect);
+  if(text.trim()){await loadFont($("font").value,text);g.push({t:"t",x:p.x,y:p.y,size:p.size,text,font:$("font").value,color:$("tcolor").value})}
+  if(g.length||p.replace){snap();if(p.replace)pages[cur].ops=pages[cur].ops.filter(o=>o!==p.replace);pages[cur].ops.push(...g);sel=g[g.length-1]||null}
+  draw();thumbs();
+}
+ed.addEventListener("keydown",e=>{if(e.key==="Enter")commit();if(e.key==="Escape"){pending=null;ed.hidden=true}});
+ed.addEventListener("blur",()=>setTimeout(commit,0));
+
+cv.addEventListener("pointerdown",e=>{
+  if(!pages.length)return;const m=pos(e),size=parseFloat($("size").value),col=$("tcolor").value,lw=+$("lw").value*S,ops=pages[cur].ops;
+  if(mode==="select"){
+    const o=[...ops].reverse().find(o=>{const b=bb(o);return m.x>=b.x-6&&m.x<=b.x+b.w+6&&m.y>=b.y-6&&m.y<=b.y+b.h+6});
+    sel=o||null;if(o){snap();mv={sx:m.x,sy:m.y,o};cv.setPointerCapture(e.pointerId)}draw();return}
+  if(mode==="add"){e.preventDefault();openEditor(m.x,m.y,(size||14)*S,"");return}
+  if(mode==="edit"){const b=hitBox(m);if(!b)return;e.preventDefault();
+    const r={t:"r",x:b.x-2,y:b.y-b.fs*.95,w:b.w+4,h:b.fs*1.3,color:$("ecolor").value};
+    ops.push(r);draw();ops.pop();openEditor(b.x,b.y,size?size*S:b.fs,b.str,r);return}
+  if(mode==="ul"||mode==="st"){const b=hitBox(m);if(!b)return;const y=mode==="ul"?b.y+b.fs*.12:b.y-b.fs*.3;
+    push({t:"l",x:b.x,y,x2:b.x+b.w,y2:y,color:col,lw:Math.max(2,b.fs/14)});return}
+  const c=cv.setPointerCapture(e.pointerId);
+  drag={erase:{t:"r",color:$("ecolor").value},hl:{t:"h",color:$("hcolor").value},rect:{t:"s",k:"r",color:col,lw},ell:{t:"s",k:"e",color:col,lw},
+    line:{t:"l",color:col,lw},pen:{t:"p",color:col,lw,pts:[[m.x,m.y]]}}[mode];
+  drag=Object.assign({},drag,{x:m.x,y:m.y,w:0,h:0,x2:m.x,y2:m.y,sx:m.x,sy:m.y});
+});
+cv.addEventListener("pointermove",e=>{
+  const m=pos(e);
+  if(mv){const i=pages[cur].ops.indexOf(sel);if(i<0)return;const n=moved(mv.o,m.x-mv.sx,m.y-mv.sy);pages[cur].ops[i]=n;sel=n;draw();return}
+  if(!drag)return;
+  if(drag.t==="p")drag.pts.push([m.x,m.y]);
+  else if(drag.t==="l"){drag.x2=m.x;drag.y2=m.y}
+  else if(drag.t==="s"){drag.w=m.x-drag.sx;drag.h=m.y-drag.sy}
+  else{drag.x=Math.min(m.x,drag.sx);drag.y=Math.min(m.y,drag.sy);drag.w=Math.abs(m.x-drag.sx);drag.h=Math.abs(m.y-drag.sy)}
+  draw();
+});
+cv.addEventListener("pointerup",e=>{
+  if(mv){mv=null;thumbs();return}
+  if(!drag)return;const d=drag;drag=null;const m=pos(e);
+  if(d.t==="h"&&d.w<4&&d.h<4){const b=hitBox(m);if(b){push({t:"h",x:b.x-2,y:b.y-b.fs*.95,w:b.w+4,h:b.fs*1.3,color:d.color});return}}
+  const ok=d.t==="p"?d.pts.length>2:d.t==="l"?Math.hypot(d.x2-d.x,d.y2-d.y)>4:Math.abs(d.w)>3&&Math.abs(d.h)>3;
+  if(ok){const{sx,sy,...o}=d;if(o.t!=="l"&&o.t!=="p"&&o.t!=="s"){}push(o)}else draw();
+});
+cv.addEventListener("dblclick",e=>{
+  if(mode!=="select")return;const m=pos(e),o=[...pages[cur].ops].reverse().find(o=>{if(o.t!=="t")return false;const b=bb(o);return m.x>=b.x&&m.x<=b.x+b.w&&m.y>=b.y&&m.y<=b.y+b.h});
+  if(o){$("font").value=o.font;$("tcolor").value=o.color;openEditor(o.x,o.y,o.size,o.text,null,o)}
+});
+
+$("img").onclick=()=>$("imgf").click();
+$("imgf").onchange=e=>{const f=e.target.files[0];if(!f||!pages.length)return;const im=new Image();
+  im.onload=()=>{const w=cv.width*.3,h=w*im.height/im.width;push({t:"i",img:im,x:(cv.width-w)/2,y:(cv.height-h)/2,w,h,color:"#000"});
+    document.querySelector('[data-mode="select"]').click()};im.src=URL.createObjectURL(f);e.target.value=""};
+$("del").onclick=delSel;
+function delSel(){if(!sel)return;const p=pages[cur];if(!p.ops.includes(sel))return;snap();p.ops=p.ops.filter(o=>o!==sel);sel=null;draw();thumbs()}
+$("undo").onclick=undo;
+document.addEventListener("keydown",e=>{
+  if(e.target.tagName==="INPUT"||e.target.tagName==="SELECT")return;
+  if((e.ctrlKey||e.metaKey)&&e.key==="z"){e.preventDefault();undo()}
+  if(e.key==="Delete"||e.key==="Backspace"){e.preventDefault();delSel()}
+});
+$("prev").onclick=()=>{commit();if(cur>0){cur--;show()}};
+$("next").onclick=()=>{commit();if(cur<pages.length-1){cur++;show()}};
+$("zoom").oninput=()=>pages.length&&zoom();
+$("q").onkeydown=e=>{if(e.key!=="Enter"||!pages.length)return;term=e.target.value.trim().toLowerCase();if(!term){draw();return}
+  for(let k=0;k<pages.length;k++){const i=(cur+(e.target.dataset.s===term?k+1:k))%pages.length;
+    if(pages[i].boxes.some(b=>b.str.toLowerCase().includes(term))){cur=i;break}}
+  e.target.dataset.s=term;show()};
+$("q").oninput=e=>{if(!e.target.value){term="";pages.length&&draw()}};
+
+$("save").onclick=async()=>{
+  await commit();const b=$("save");b.disabled=true;b.textContent="Preparing…";
+  try{for(const f of new Set(pages.flatMap(p=>p.ops.filter(o=>o.t==="t").map(o=>o.font))))await loadFont(f);
+    const{jsPDF}=window.jspdf;let pdf=null;
+    for(const p of pages){const c=document.createElement("canvas");c.width=p.base.width;c.height=p.base.height;paint(c.getContext("2d"),p);
+      const w=c.width/S,h=c.height/S,o=w>h?"l":"p";
+      if(!pdf)pdf=new jsPDF({unit:"pt",format:[w,h],orientation:o,compress:true});else pdf.addPage([w,h],o);
+      pdf.addImage(c.toDataURL("image/jpeg",.92),"JPEG",0,0,w,h)}
+    pdf.save(fname)}catch(err){alert("Could not save: "+err.message)}
+  b.disabled=false;b.textContent="Download PDF";
+};
+</script>
+</body>
+</html>
